@@ -2,6 +2,7 @@ package com.rhub.app.ui.director
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rhub.app.data.ErrorMessages
 import com.rhub.app.data.Repository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,7 +34,7 @@ class OverviewViewModel : ViewModel() {
 
                 _state.value = OverviewUiState.Success(employes, postes, conges)
             } catch (e: Exception) {
-                _state.value = OverviewUiState.Error(e.message ?: "Erreur de chargement.")
+                _state.value = OverviewUiState.Error(ErrorMessages.friendly(e.message))
             }
         }
     }
