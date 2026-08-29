@@ -46,6 +46,15 @@ data class Presence(
 )
 
 @Serializable
+data class NouvellePresence(
+    val entreprise_id: String,
+    val utilisateur_id: String,
+    val date: String,
+    val heure_arrivee: String,
+    val statut: String = "present"
+)
+
+@Serializable
 data class Conge(
     val id: String? = null,
     val entreprise_id: String,
