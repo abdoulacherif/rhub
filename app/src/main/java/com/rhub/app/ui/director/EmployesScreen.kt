@@ -1,6 +1,7 @@
 package com.rhub.app.ui.director
 
 import android.content.Intent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -141,7 +142,7 @@ private fun NouvelleInvitationDialog(
                         label = { Text("Poste") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickableSafe { menuPosteOuvert = true }
+                            .clickable { menuPosteOuvert = true }
                     )
                     DropdownMenu(expanded = menuPosteOuvert, onDismissRequest = { menuPosteOuvert = false }) {
                         postes.forEach { p ->
@@ -192,17 +193,4 @@ private fun NouvelleInvitationDialog(
             TextButton(onClick = onFermer) { Text("Annuler") }
         }
     )
-}
-
-// Petit raccourci pour rendre un champ en lecture seule cliquable (ouvre le menu déroulant)
-@Composable
-private fun Modifier.clickableSafe(onClick: () -> Unit): Modifier {
-    return this.then(
-        Modifier.pointerInputClickable(onClick)
-    )
-}
-
-@Composable
-private fun Modifier.pointerInputClickable(onClick: () -> Unit): Modifier {
-    return androidx.compose.foundation.clickable(onClick = onClick).let { this.then(it) }
 }
