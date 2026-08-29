@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rhub.app.SupabaseClientProvider
 import com.rhub.app.data.Utilisateur
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,12 +33,12 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             _state.value = AuthUiState.Loading
             try {
-                client.auth.signInWith(Email) {
+                client.gotrue.signInWith(Email) {
                     this.email = email
                     this.password = motDePasse
                 }
 
-                val uid = client.auth.currentUserOrNull()?.id
+                val uid = client.gotrue.currentUserOrNull()?.id
                     ?: throw IllegalStateException("Connexion impossible.")
 
                 val userRow = client.postgrest["utilisateurs"]
@@ -74,12 +74,12 @@ class AuthViewModel : ViewModel() {
                     return@launch
                 }
 
-                client.auth.signUpWith(Email) {
+                client.gotrue.signUpWith(Email) {
                     this.email = payload.email
                     this.password = motDePasse
                 }
 
-                val session = client.auth.currentSessionOrNull()
+                val session = client.gotrue.currentSessionOrNull()
                 if (session != null) {
                     finaliserCreationEntreprise(payload)
                     _state.value = AuthUiState.Success("directeur")
