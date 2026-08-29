@@ -4,6 +4,8 @@ import com.rhub.app.SupabaseClientProvider
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.serialization.Serializable
+import java.time.Instant
+import java.time.LocalDate
 
 object Repository {
     private val client = SupabaseClientProvider.client
@@ -13,6 +15,12 @@ object Repository {
         return client.postgrest["utilisateurs"]
             .select { filter { eq("id", uid) } }
             .decodeSingleOrNull<Utilisateur>()
+    }
+
+    suspend fun obtenirPoste(posteId: String): Poste? {
+        return client.postgrest["postes"]
+            .select { filter { eq("id", posteId) } }
+            .decodeSingleOrNull<Poste>()
     }
 
     suspend fun compterEmployesActifs(entrepriseId: String): Int =
@@ -98,6 +106,64 @@ object Repository {
     suspend fun annulerInvitation(invitationId: String) {
         client.postgrest["invitations"]
             .update({ set("statut", "annulee") }) { filter { eq("id", invitationId) } }
+    }
+
+    suspend fun listerConges(entrepriseId: String): List<Conge> {
+        return client.postgrest["conges"]
+            .select { filter { eq("entreprise_id", entrepriseId) } }
+            .decodeList<Conge>()
+    }
+
+    suspend fun traiterConge(congeId: String, statut: String, valideParId: String) {
+        client.postgrest["conges"]
+            .update({
+                set("statut", statut)
+                set("valide_par", valideParId)
+            }) { filter { eq("id", congeId) } }
+    }
+
+    // ---------------- Présence (employé) ----------------
+
+    fun dateDuJour(): String = LocalDate.now().toString()
+
+    suspend fun obtenirPresenceDuJour(utilisateurId: String): Presence? {
+        return client.postgrest["presences"]
+            .select {
+                filter {
+                    eq("utilisateur_id", utilisateurId)
+                    eq("date", dateDuJour())
+                }
+            }
+            .decodeSingleOrNull<Presence>()
+    }
+
+    suspend fun listerPresences(utilisateurId: String): List<Presence> {
+        return client.postgrest["presences"]
+            .select { filter { eq("utilisateur_id", utilisateurId) } }
+            .decodeList<Presence>()
+            .sortedByDescending { it.date }
+            .take(15)
+    }
+
+    suspend fun pointerArrivee(entrepriseId: String, utilisateurId: String) {
+        client.postgrest["presences"].insert(
+            NouvellePresence(
+                entreprise_id = entrepriseId,
+                utilisateur_id = utilisateurId,
+                date = dateDuJour(),
+                heure_arrivee = Instant.now().toString()
+            )
+        )
+    }
+
+    suspend fun pointerDepart(utilisateurId: String) {
+        client.postgrest["presences"]
+            .update({ set("heure_depart", Instant.now().toString()) }) {
+                filter {
+                    eq("utilisateur_id", utilisateurId)
+                    eq("date", dateDuJour())
+                }
+            }
     }
 }
 
