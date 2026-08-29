@@ -3,6 +3,7 @@ package com.rhub.app.ui.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rhub.app.SupabaseClientProvider
+import com.rhub.app.data.ErrorMessages
 import com.rhub.app.data.Utilisateur
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -60,7 +61,7 @@ class AuthViewModel : ViewModel() {
                     _state.value = AuthUiState.Success(userRow.role)
                 }
             } catch (e: Exception) {
-                _state.value = AuthUiState.Error(traduireErreur(e.message))
+                _state.value = AuthUiState.Error(ErrorMessages.friendly(e.message))
             }
         }
     }
@@ -88,7 +89,7 @@ class AuthViewModel : ViewModel() {
                     _state.value = AuthUiState.ConfirmationRequise
                 }
             } catch (e: Exception) {
-                _state.value = AuthUiState.Error(traduireErreur(e.message))
+                _state.value = AuthUiState.Error(ErrorMessages.friendly(e.message))
             }
         }
     }
@@ -108,14 +109,6 @@ class AuthViewModel : ViewModel() {
                 put("p_taille", p.taille)
             }
         )
-    }
-
-    private fun traduireErreur(msg: String?): String = when {
-        msg == null -> "Une erreur est survenue. Réessayez."
-        msg.contains("already registered", true) -> "Cette adresse e-mail est déjà utilisée."
-        msg.contains("Invalid login credentials", true) -> "E-mail ou mot de passe incorrect."
-        msg.contains("rate limit", true) -> "Trop de tentatives. Réessayez dans quelques minutes."
-        else -> msg
     }
 }
 
