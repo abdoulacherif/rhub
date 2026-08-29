@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.rhub.app"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -42,13 +42,11 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
-    // --- Supabase (auth + base de données + fonctions RPC) ---
-    // NOTE : le module s'appelle "gotrue-kt" dans la version 2.5.4 du BOM
-    // (l'ancien nom, avant le renommage en "auth-kt" dans des versions plus récentes).
-    implementation(platform("io.github.jan-tennert.supabase:bom:2.5.4"))
+    // --- Supabase (module "auth-kt" — nom actuel depuis la version 3.0.0) ---
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.2.6"))
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
-    implementation("io.github.jan-tennert.supabase:gotrue-kt")
-    implementation("io.ktor:ktor-client-android:2.3.12")
+    implementation("io.github.jan-tennert.supabase:auth-kt")
+    implementation("io.ktor:ktor-client-android:3.0.3")
 
     // --- Sérialisation JSON ---
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
