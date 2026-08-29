@@ -43,9 +43,11 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // --- Supabase (auth + base de données + fonctions RPC) ---
+    // NOTE : le module s'appelle "gotrue-kt" dans la version 2.5.4 du BOM
+    // (l'ancien nom, avant le renommage en "auth-kt" dans des versions plus récentes).
     implementation(platform("io.github.jan-tennert.supabase:bom:2.5.4"))
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
-    implementation("io.github.jan-tennert.supabase:auth-kt")
+    implementation("io.github.jan-tennert.supabase:gotrue-kt")
     implementation("io.ktor:ktor-client-android:2.3.12")
 
     // --- Sérialisation JSON ---
