@@ -15,25 +15,11 @@ object Repository {
             .decodeSingleOrNull<Utilisateur>()
     }
 
-    suspend fun compterEmployesActifs(entrepriseId: String): Int {
-        return client.postgrest["utilisateurs"]
-            .select {
-                filter {
-                    eq("entreprise_id", entrepriseId)
-                    eq("role", "employe")
-                    eq("statut", "actif")
-                }
-            }
-            .decodeList<Utilisateur>()
-            .size
-    }
+    suspend fun compterEmployesActifs(entrepriseId: String): Int =
+        listerEmployes(entrepriseId).size
 
-    suspend fun compterPostes(entrepriseId: String): Int {
-        return client.postgrest["postes"]
-            .select { filter { eq("entreprise_id", entrepriseId) } }
-            .decodeList<Poste>()
-            .size
-    }
+    suspend fun compterPostes(entrepriseId: String): Int =
+        listerPostes(entrepriseId).size
 
     suspend fun compterCongesEnAttente(entrepriseId: String): Int {
         return client.postgrest["conges"]
@@ -62,6 +48,56 @@ object Repository {
                 description = description
             )
         )
+    }
+
+    suspend fun listerEmployes(entrepriseId: String): List<Utilisateur> {
+        return client.postgrest["utilisateurs"]
+            .select {
+                filter {
+                    eq("entreprise_id", entrepriseId)
+                    eq("role", "employe")
+                    eq("statut", "actif")
+                }
+            }
+            .decodeList<Utilisateur>()
+    }
+
+    suspend fun listerInvitationsEnAttente(entrepriseId: String): List<Invitation> {
+        return client.postgrest["invitations"]
+            .select {
+                filter {
+                    eq("entreprise_id", entrepriseId)
+                    eq("statut", "en_attente")
+                }
+            }
+            .decodeList<Invitation>()
+    }
+
+    suspend fun genererInvitation(
+        entrepriseId: String,
+        posteId: String?,
+        email: String,
+        telephone: String?,
+        salairePropose: Double?,
+        creeParId: String
+    ): Invitation {
+        return client.postgrest["invitations"]
+            .insert(
+                NouvelleInvitation(
+                    entreprise_id = entrepriseId,
+                    poste_id = posteId,
+                    email = email,
+                    telephone = telephone,
+                    salaire_propose = salairePropose,
+                    cree_par = creeParId
+                )
+            ) { select() }
+            .decodeSingle<Invitation>()
+    }
+
+    suspend fun annulerInvitation(invitationId: String) {
+        client.postgrest["invitations"]
+            .update({ set("statut", "annulee") }) { filter { eq("id", invitationId) } }
     }
 }
 
