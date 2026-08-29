@@ -32,13 +32,20 @@ fun DirectorHomeScreen() {
                     icon = { Text("▤") },
                     label = { Text("Postes") }
                 )
+                NavigationBarItem(
+                    selected = ongletActuel == 2,
+                    onClick = { ongletActuel = 2 },
+                    icon = { Text("◎") },
+                    label = { Text("Employés") }
+                )
             }
         }
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             when (ongletActuel) {
                 0 -> OverviewScreen()
-                else -> PostesScreen()
+                1 -> PostesScreen()
+                else -> EmployesScreen()
             }
         }
     }
