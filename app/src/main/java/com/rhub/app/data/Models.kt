@@ -67,6 +67,16 @@ data class Conge(
 )
 
 @Serializable
+data class NouveauConge(
+    val entreprise_id: String,
+    val utilisateur_id: String,
+    val type_conge: String,
+    val date_debut: String,
+    val date_fin: String,
+    val motif: String? = null
+)
+
+@Serializable
 data class TachePoste(
     val id: String,
     val poste_id: String,
