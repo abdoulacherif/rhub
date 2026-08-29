@@ -2,6 +2,7 @@ package com.rhub.app.ui.director
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rhub.app.data.ErrorMessages
 import com.rhub.app.data.Poste
 import com.rhub.app.data.Repository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,7 +38,7 @@ class PostesViewModel : ViewModel() {
                 val postes = Repository.listerPostes(eid)
                 _state.value = PostesUiState.Success(postes)
             } catch (e: Exception) {
-                _state.value = PostesUiState.Error(e.message ?: "Erreur de chargement.")
+                _state.value = PostesUiState.Error(ErrorMessages.friendly(e.message))
             }
         }
     }
@@ -51,7 +52,7 @@ class PostesViewModel : ViewModel() {
                 Repository.creerPoste(eid, nom, salaire, description)
                 charger()
             } catch (e: Exception) {
-                _erreurCreation.value = e.message ?: "Erreur lors de la création."
+                _erreurCreation.value = ErrorMessages.friendly(e.message)
             } finally {
                 _creationEnCours.value = false
             }
