@@ -73,3 +73,24 @@ data class TacheTravail(
     val statut: String,
     val date_terminee: String
 )
+
+@Serializable
+data class Invitation(
+    val id: String,
+    val entreprise_id: String,
+    val poste_id: String? = null,
+    val email: String,
+    val code: String,
+    val statut: String,
+    val expire_le: String
+)
+
+@Serializable
+data class NouvelleInvitation(
+    val entreprise_id: String,
+    val poste_id: String?,
+    val email: String,
+    val telephone: String? = null,
+    val salaire_propose: Double? = null,
+    val cree_par: String
+)
