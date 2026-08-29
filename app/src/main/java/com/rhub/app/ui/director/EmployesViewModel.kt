@@ -66,7 +66,9 @@ class EmployesViewModel : ViewModel() {
             _lienGenere.value = null
             try {
                 val invitation = Repository.genererInvitation(eid, posteId, email, telephone, salaire, uid)
-                _lienGenere.value = "https://TON-DOMAINE/rejoindre.html?code=${invitation.code}"
+                // Chaque lien est unique et lié à cette adresse e-mail précise :
+                // il devient inutilisable après une seule inscription réussie (sécurité anti-réutilisation).
+                _lienGenere.value = "https://predixbot.vercel.app/rejoindre.html?code=${invitation.code}"
                 charger()
             } catch (e: Exception) {
                 _erreurInvitation.value = e.message ?: "Erreur lors de l'invitation."
