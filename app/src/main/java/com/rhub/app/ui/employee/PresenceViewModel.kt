@@ -2,65 +2,41 @@ package com.rhub.app.ui.employee
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rhub.app.data.ErrorMessages
+import com.rhub.app.data.Poste
 import com.rhub.app.data.Presence
 import com.rhub.app.data.Repository
+import com.rhub.app.data.Utilisateur
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-sealed class PresenceUiState {
-    object Loading : PresenceUiState()
-    data class Error(val message: String) : PresenceUiState()
-    data class Success(val presenceDuJour: Presence?, val historique: List<Presence>) : PresenceUiState()
+sealed class EmployeeOverviewUiState {
+    object Loading : EmployeeOverviewUiState()
+    data class Error(val message: String) : EmployeeOverviewUiState()
+    data class Success(
+        val utilisateur: Utilisateur,
+        val poste: Poste?,
+        val presenceDuJour: Presence?
+    ) : EmployeeOverviewUiState()
 }
 
-class PresenceViewModel : ViewModel() {
-    private val _state = MutableStateFlow<PresenceUiState>(PresenceUiState.Loading)
-    val state: StateFlow<PresenceUiState> = _state
-
-    private var entrepriseId: String? = null
-    private var utilisateurId: String? = null
-
-    private val _actionEnCours = MutableStateFlow(false)
-    val actionEnCours: StateFlow<Boolean> = _actionEnCours
+class EmployeeOverviewViewModel : ViewModel() {
+    private val _state = MutableStateFlow<EmployeeOverviewUiState>(EmployeeOverviewUiState.Loading)
+    val state: StateFlow<EmployeeOverviewUiState> = _state
 
     fun charger() {
         viewModelScope.launch {
-            _state.value = PresenceUiState.Loading
+            _state.value = EmployeeOverviewUiState.Loading
             try {
                 val utilisateur = Repository.obtenirUtilisateurCourant()
                     ?: throw IllegalStateException("Profil introuvable.")
-                entrepriseId = utilisateur.entreprise_id
-                utilisateurId = utilisateur.id
+                val poste = utilisateur.poste_id?.let { Repository.obtenirPoste(it) }
+                val presence = Repository.obtenirPresenceDuJour(utilisateur.id)
 
-                val presenceDuJour = Repository.obtenirPresenceDuJour(utilisateur.id)
-                val historique = Repository.listerPresences(utilisateur.id)
-
-                _state.value = PresenceUiState.Success(presenceDuJour, historique)
+                _state.value = EmployeeOverviewUiState.Success(utilisateur, poste, presence)
             } catch (e: Exception) {
-                _state.value = PresenceUiState.Error(e.message ?: "Erreur de chargement.")
-            }
-        }
-    }
-
-    fun pointer() {
-        val eid = entrepriseId ?: return
-        val uid = utilisateurId ?: return
-        val s = _state.value as? PresenceUiState.Success ?: return
-
-        viewModelScope.launch {
-            _actionEnCours.value = true
-            try {
-                if (s.presenceDuJour?.heure_arrivee == null) {
-                    Repository.pointerArrivee(eid, uid)
-                } else if (s.presenceDuJour.heure_depart == null) {
-                    Repository.pointerDepart(uid)
-                }
-                charger()
-            } catch (_: Exception) {
-                charger()
-            } finally {
-                _actionEnCours.value = false
+                _state.value = EmployeeOverviewUiState.Error(ErrorMessages.friendly(e.message))
             }
         }
     }
