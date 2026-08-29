@@ -23,7 +23,7 @@ jobs:
       - name: Installer et configurer Gradle automatiquement
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.7'
+          gradle-version: '8.13'
 
       - name: Compiler l'APK debug
         run: gradle assembleDebug
