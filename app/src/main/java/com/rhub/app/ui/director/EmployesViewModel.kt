@@ -2,6 +2,7 @@ package com.rhub.app.ui.director
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rhub.app.data.ErrorMessages
 import com.rhub.app.data.Invitation
 import com.rhub.app.data.Poste
 import com.rhub.app.data.Repository
@@ -52,7 +53,7 @@ class EmployesViewModel : ViewModel() {
 
                 _state.value = EmployesUiState.Success(employes, invitations, postes)
             } catch (e: Exception) {
-                _state.value = EmployesUiState.Error(e.message ?: "Erreur de chargement.")
+                _state.value = EmployesUiState.Error(ErrorMessages.friendly(e.message))
             }
         }
     }
@@ -66,12 +67,10 @@ class EmployesViewModel : ViewModel() {
             _lienGenere.value = null
             try {
                 val invitation = Repository.genererInvitation(eid, posteId, email, telephone, salaire, uid)
-                // Chaque lien est unique et lié à cette adresse e-mail précise :
-                // il devient inutilisable après une seule inscription réussie (sécurité anti-réutilisation).
                 _lienGenere.value = "https://predixbot.vercel.app/rejoindre.html?code=${invitation.code}"
                 charger()
             } catch (e: Exception) {
-                _erreurInvitation.value = e.message ?: "Erreur lors de l'invitation."
+                _erreurInvitation.value = ErrorMessages.friendly(e.message)
             } finally {
                 _invitationEnCours.value = false
             }
@@ -80,7 +79,11 @@ class EmployesViewModel : ViewModel() {
 
     fun annulerInvitation(id: String) {
         viewModelScope.launch {
-            Repository.annulerInvitation(id)
+            try {
+                Repository.annulerInvitation(id)
+            } catch (_: Exception) {
+                // Échec silencieux : on recharge simplement l'état réel depuis la base
+            }
             charger()
         }
     }
