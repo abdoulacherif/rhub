@@ -32,13 +32,20 @@ fun EmployeeHomeScreen() {
                     icon = { Text("◷") },
                     label = { Text("Présence") }
                 )
+                NavigationBarItem(
+                    selected = ongletActuel == 2,
+                    onClick = { ongletActuel = 2 },
+                    icon = { Text("▦") },
+                    label = { Text("Congés") }
+                )
             }
         }
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             when (ongletActuel) {
                 0 -> EmployeeOverviewScreen()
-                else -> PresenceScreen()
+                1 -> PresenceScreen()
+                else -> MesCongesScreen()
             }
         }
     }
