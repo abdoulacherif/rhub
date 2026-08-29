@@ -122,6 +122,32 @@ object Repository {
             }) { filter { eq("id", congeId) } }
     }
 
+    suspend fun listerMesConges(utilisateurId: String): List<Conge> {
+        return client.postgrest["conges"]
+            .select { filter { eq("utilisateur_id", utilisateurId) } }
+            .decodeList<Conge>()
+    }
+
+    suspend fun demanderConge(
+        entrepriseId: String,
+        utilisateurId: String,
+        typeConge: String,
+        dateDebut: String,
+        dateFin: String,
+        motif: String?
+    ) {
+        client.postgrest["conges"].insert(
+            NouveauConge(
+                entreprise_id = entrepriseId,
+                utilisateur_id = utilisateurId,
+                type_conge = typeConge,
+                date_debut = dateDebut,
+                date_fin = dateFin,
+                motif = motif
+            )
+        )
+    }
+
     // ---------------- Présence (employé) ----------------
 
     fun dateDuJour(): String = LocalDate.now().toString()
