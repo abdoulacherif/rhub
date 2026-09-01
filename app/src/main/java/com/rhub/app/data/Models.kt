@@ -77,6 +77,20 @@ data class NouveauConge(
 )
 
 @Serializable
+data class BulletinPaie(
+    val id: String,
+    val entreprise_id: String,
+    val utilisateur_id: String,
+    val mois: Int,
+    val annee: Int,
+    val salaire_brut: Double,
+    val charges: Double,
+    val salaire_net: Double,
+    val statut_versement: String,
+    val date_versement: String? = null
+)
+
+@Serializable
 data class TachePoste(
     val id: String,
     val poste_id: String,
