@@ -38,6 +38,12 @@ fun EmployeeHomeScreen() {
                     icon = { Text("▦") },
                     label = { Text("Congés") }
                 )
+                NavigationBarItem(
+                    selected = ongletActuel == 3,
+                    onClick = { ongletActuel = 3 },
+                    icon = { Text("◈") },
+                    label = { Text("Paie") }
+                )
             }
         }
     ) { padding ->
@@ -45,7 +51,8 @@ fun EmployeeHomeScreen() {
             when (ongletActuel) {
                 0 -> EmployeeOverviewScreen()
                 1 -> PresenceScreen()
-                else -> MesCongesScreen()
+                2 -> MesCongesScreen()
+                else -> MesBulletinsScreen()
             }
         }
     }
