@@ -148,6 +148,13 @@ object Repository {
         )
     }
 
+    suspend fun listerMesBulletins(utilisateurId: String): List<BulletinPaie> {
+        return client.postgrest["bulletins_paie"]
+            .select { filter { eq("utilisateur_id", utilisateurId) } }
+            .decodeList<BulletinPaie>()
+            .sortedWith(compareByDescending<BulletinPaie> { it.annee }.thenByDescending { it.mois })
+    }
+
     // ---------------- Présence (employé) ----------------
 
     fun dateDuJour(): String = LocalDate.now().toString()
